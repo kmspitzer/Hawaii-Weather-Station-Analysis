@@ -52,9 +52,9 @@ def welcome():
         f"Available Routes:<br/>"
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
-        f"/api/v1.0/tobs"
-        f"/api/v1.0/<start>"
-        f"/api/v1.0/<start>/<end>"
+        f"/api/v1.0/tobs<br/>"
+        f"/api/v1.0/start_date<br/>"
+        f"/api/v1.0/start_date/end_date"
     )
 
 
@@ -118,7 +118,6 @@ def tobs():
             order_by(func.count(Measurement.station).desc()).first()
 
     busy_station = stn_query.station
-#
  
     results = session.query(Measurement.tobs).\
             filter(Measurement.station == busy_station).\
