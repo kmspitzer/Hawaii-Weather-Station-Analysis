@@ -11,6 +11,39 @@ from flask import Flask, jsonify
 import os
 import sys
 
+
+##################################################################
+#
+# SQLalchemy Challenge      due 8-Feb-2021
+#       Kate Spitzer
+#
+# This script uses Flask to create a simple web application
+# that has a few simple routes which access the hawaii.sqlite
+# database.
+#
+#       /api/v1.0/precipitation
+#           - returns a JSON dictionary of all precipitation data
+#               from the measurement table using date as the key
+#               and prcp as the value.
+#       /api/v1.0/stations
+#           - returns a JSON list of all stations found in the
+#               stations table.
+#       /api/v1.0/tobs
+#           - returns a JSON list of all temperature observation
+#               data found in the measurement table.
+#       /api/v1.0/start_date
+#           - returns a JSON list containing the minimum temperature,
+#               the average temperature, and the maximum temperature
+#               from the measurement table for all dates beginning
+#               at the start date entered and later.
+#       /api/v1.0/start_date/end_date
+#           - returns a JSON list containing the minimum temperature,
+#               the average temperature, and the maximum temperature
+#               from the measurement table for all dates between the
+#               start date and end date entered, inclusive.
+#
+##################################################################
+
 print(os.path.dirname(__file__))
 
 root_project_path = os.path.join(os.path.dirname(__file__))
@@ -145,7 +178,7 @@ def start_date(start):
                         filter(Measurement.date >= start).all()
     session.close()
 
-    stat_list = [stats_with_start[0][0], stats_with_start[0][1], stats_with_start[0][2]]
+    stat_list = [stats_with_start[0][0], round(stats_with_start[0][1], 2), stats_with_start[0][2]]
 
 
     return jsonify(stat_list)
@@ -168,7 +201,7 @@ def date_range(start, end):
                             filter(Measurement.date <= end).all()
     session.close()
 
-    stat_list = [stats_with_start[0][0], stats_with_start[0][1], stats_with_start[0][2]]
+    stat_list = [stats_with_start[0][0], round(stats_with_start[0][1], 2), stats_with_start[0][2]]
 
 
     return jsonify(stat_list)
