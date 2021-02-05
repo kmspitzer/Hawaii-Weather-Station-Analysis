@@ -53,6 +53,8 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs"
+        f"/api/v1.0/<start>"
+        f"/api/v1.0/<start>/<end>"
     )
 
 
@@ -126,16 +128,54 @@ def tobs():
 
     all_tobs = list(np.ravel(results))
 
-    # Create a dictionary from the row data and append to a list of all_passengers
-#    all_passengers = []
-#    for name, age, sex in results:
-#        passenger_dict = {}
-#        passenger_dict["name"] = name
-#        passenger_dict["age"] = age
-#        passenger_dict["sex"] = sex
-#        all_passengers.append(passenger_dict)
-
     return jsonify(all_tobs)
+
+
+
+@app.route("/api/v1.0/<start>")
+def start_date(start):
+    """Fetch the Justice League character whose real_name matches
+       the path variable supplied by the user, or a 404 if not."""
+
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    stats_with_start = session.query(func.min(Measurement.tobs),\
+                        func.avg(Measurement.tobs),\
+                        func.max(Measurement.tobs)).\
+                        filter(Measurement.date >= start).all()
+    session.close()
+
+    stat_list = [stats_with_start[0][0], stats_with_start[0][1], stats_with_start[0][2]]
+
+
+    return jsonify(stat_list)
+
+
+
+
+@app.route("/api/v1.0/<start>/<end>")
+def date_range(start, end):
+    """Fetch the Justice League character whose real_name matches
+       the path variable supplied by the user, or a 404 if not."""
+
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    stats_with_start = session.query(func.min(Measurement.tobs),\
+                        func.avg(Measurement.tobs),\
+                        func.max(Measurement.tobs)).\
+                            filter(Measurement.date >= start).\
+                            filter(Measurement.date <= end).all()
+    session.close()
+
+    stat_list = [stats_with_start[0][0], stats_with_start[0][1], stats_with_start[0][2]]
+
+
+    return jsonify(stat_list)
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=False)
