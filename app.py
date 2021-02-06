@@ -44,6 +44,7 @@ import sys
 #
 ##################################################################
 
+# build path to sqlite database
 print(os.path.dirname(__file__))
 
 root_project_path = os.path.join(os.path.dirname(__file__))
@@ -59,6 +60,7 @@ engine = create_engine("sqlite:///"+hawaii_path)
 
 # reflect an existing database into a new model
 Base = automap_base()
+
 # reflect the tables
 Base.prepare(engine, reflect=True)
 
@@ -77,10 +79,11 @@ app = Flask(__name__)
 #################################################
 # Flask Routes
 #################################################
-
+# root page
+#################################################
 @app.route("/")
 def welcome():
-    """List all available api routes."""
+    """  List all available api routes.  """
     return (
         f"Available Routes:<br/>"
         f"/api/v1.0/precipitation<br/>"
@@ -90,19 +93,22 @@ def welcome():
         f"/api/v1.0/start_date/end_date"
     )
 
-
+######################
+# precipitation route
+######################
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of all passenger names"""
-    # Query all passengers
+    """  CreateReturn a dictionary of precipitation data  """
+    # Query all precipitation data
     results = session.query(Measurement.date,\
             Measurement.prcp).all()
 
     session.close()
 
+    # create a dictionary from the query results
     all_precip = []
     for date, prcp in results:
         precip_dict = {}
@@ -112,32 +118,35 @@ def precipitation():
 
     return jsonify(all_precip)
 
-
+######################
+# station route
+######################
 @app.route("/api/v1.0/stations")
 def stations():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of passenger data including the name, age, and sex of each passenger"""
-    # Query all passengers
+    """  Return a list of station names  """
+    # Query all stations
     results = session.query(Station.station).all()
 
     session.close()
 
-    # Create a dictionary from the row data and append to a list of all_passengers
-     # Convert list of tuples into normal list
+    # Create a list of stations
     all_stations = list(np.ravel(results))
-
 
     return jsonify(all_stations)
 
 
+################################
+# temperature observation route
+################################
 @app.route("/api/v1.0/tobs")
 def tobs():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of passenger data including the name, age, and sex of each passenger"""    
+    """  Return a list of observed temperatures for the most active station for the most current year  """    
     # Find the most recent date in the data set
     max_date = session.query(func.max(Measurement.date)).scalar()
 
@@ -151,33 +160,39 @@ def tobs():
             order_by(func.count(Measurement.station).desc()).first()
 
     busy_station = stn_query.station
- 
+
+    # retrieve all rows for the station for the most current year
     results = session.query(Measurement.tobs).\
             filter(Measurement.station == busy_station).\
             filter(Measurement.date > min_date).all()
 
     session.close()
 
+    # create a list of temperatures
     all_tobs = list(np.ravel(results))
 
     return jsonify(all_tobs)
 
 
-
+##################################
+# aggregate temps with start date
+##################################
 @app.route("/api/v1.0/<start>")
 def start_date(start):
-    """Fetch the Justice League character whose real_name matches
-       the path variable supplied by the user, or a 404 if not."""
+
+    """  Calculate the low temp, average temp, and high temp starting at the date entered  """
 
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
+    # query data to calculate stats for date greater than or equal to date entered
     stats_with_start = session.query(func.min(Measurement.tobs),\
                         func.avg(Measurement.tobs),\
                         func.max(Measurement.tobs)).\
                         filter(Measurement.date >= start).all()
     session.close()
 
+    # create a list with results
     stat_list = [stats_with_start[0][0], round(stats_with_start[0][1], 2), stats_with_start[0][2]]
 
 
@@ -194,20 +209,21 @@ def date_range(start, end):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    stats_with_start = session.query(func.min(Measurement.tobs),\
+    # query data to calculate stats for date within range entered
+    stats_with_range = session.query(func.min(Measurement.tobs),\
                         func.avg(Measurement.tobs),\
                         func.max(Measurement.tobs)).\
                             filter(Measurement.date >= start).\
                             filter(Measurement.date <= end).all()
     session.close()
 
-    stat_list = [stats_with_start[0][0], round(stats_with_start[0][1], 2), stats_with_start[0][2]]
-
+    # create a list with results
+    stat_list = [stats_with_range[0][0], round(stats_with_range[0][1], 2), stats_with_range[0][2]]
 
     return jsonify(stat_list)
 
 
 
-
+# execute main
 if __name__ == '__main__':
     app.run(debug=False)
