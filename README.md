@@ -4,7 +4,7 @@
  
        Kate Spitzer
        
-       The SQLalchemy challenge uses precipitation and temperature observation data from several weather stations
+       The Hawaii Weather Station Analysis uses precipitation and temperature observation data from several weather stations
        in Hawaii to facilitate our analysis.  Scripts were written using 3 Jupyter notebooks, and a Python file.
        
        Inputs:                                                  Outputs:
