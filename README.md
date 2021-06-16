@@ -30,6 +30,8 @@
        than 2000 data points, making the labels unreadable.  The chart is saved as a PNG in the file
        output/precip_barchart.png.  Finally, summary statistics for the table are displayed.
        
+   ![image](/output/precip_barchart.png)
+       
        Next, we were to list the stations found in the Measurement table, along with the number of datapoints associated
        with each one, in descending order by number of datapoints.  Then we were to pull the station id for the most
        active station (station with the most datapoints), and use this to calculate the minimum, maximum and average
@@ -41,6 +43,9 @@
        
        Finally, our session was closed.
        
+   ![image](/output/temperature_histogram.png)
+   
+   
        app.py
        ------
        
@@ -92,6 +97,8 @@
        generate a single-bar bar chart with an error bar to indicate estimated error or uncertainty in the data.
        The chart is saved as a PNG in the file output/trip_avgtemp_bar.png.
        
+   ![image](/output/trip_avgtemp_bar.png)  
+       
        We then joined the Measurement and Station tables to calculate total precipitation measure per station,
        and display that data along with the station id, the station name, and the station's latitude, longitude,
        and elevation in ascending order by total precipitation.
@@ -102,6 +109,8 @@
        Pandas plot.area() method. The chart is saved as a PNG in the file output/dailynormals_area.png. 
        
        Finally, our session was closed.
+       
+   ![image](/output/dailynormals_area.png) 
 
        
        
